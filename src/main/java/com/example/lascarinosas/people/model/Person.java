@@ -1,7 +1,7 @@
 package com.example.lascarinosas.people.model;
 import com.example.lascarinosas.families.model.Family;
 import com.example.lascarinosas.properties.Property;
-import com.example.lascarinosas.victims.Victim;
+import com.example.lascarinosas.victims.Victims;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -34,5 +34,5 @@ public class Person {
 
     // One-to-one victim relationship
     @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
-    private Victim victim;
+    private Victims victim;
 }
