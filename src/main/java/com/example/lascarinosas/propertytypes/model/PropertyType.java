@@ -1,6 +1,6 @@
-package com.example.lascarinosas.propertytypes;
+package com.example.lascarinosas.propertytypes.model;
 
-import com.example.lascarinosas.properties.Property;
+import com.example.lascarinosas.properties.model.Property;
 import jakarta.persistence.*;
 import lombok.Data;
 

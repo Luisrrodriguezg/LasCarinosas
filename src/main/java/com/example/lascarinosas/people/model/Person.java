@@ -1,7 +1,7 @@
 package com.example.lascarinosas.people.model;
 import com.example.lascarinosas.families.model.Family;
-import com.example.lascarinosas.properties.Property;
-import com.example.lascarinosas.victims.Victims;
+import com.example.lascarinosas.properties.model.Property;
+import com.example.lascarinosas.victims.model.Victims;
 import jakarta.persistence.*;
 import lombok.Data;
 

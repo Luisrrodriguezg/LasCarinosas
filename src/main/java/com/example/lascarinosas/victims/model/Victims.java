@@ -1,4 +1,4 @@
-package com.example.lascarinosas.victims;
+package com.example.lascarinosas.victims.model;
 
 import com.example.lascarinosas.people.model.Person;
 import jakarta.persistence.*;
