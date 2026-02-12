@@ -5,6 +5,7 @@ import com.example.lascarinosas.victims.model.Victims;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -18,7 +19,8 @@ public class Person {
     @Column(nullable = false, length = 120)
     private String name;
 
-    private Integer age;
+    @Column(name = "date_of_birth", nullable = false)
+    private LocalDate dateOfBirth;
 
     @Column(length = 120)
     private String occupation;
@@ -28,7 +30,7 @@ public class Person {
     @JoinColumn(name = "family_id")
     private Family family;
 
-    // One person canց may own many properties
+    // One person may own many properties
     @OneToMany(mappedBy = "owner")
     private List<Property> properties;
 
