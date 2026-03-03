@@ -1,4 +1,4 @@
-package com.example.lascarinosas.people.dto;
+package com.example.lascarinosas.people.dtos;
 
 import com.example.lascarinosas.people.model.PersonRole;
 import jakarta.validation.constraints.NotBlank;

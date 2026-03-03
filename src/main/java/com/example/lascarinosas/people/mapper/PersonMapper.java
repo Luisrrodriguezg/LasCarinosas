@@ -1,10 +1,9 @@
 package com.example.lascarinosas.people.mapper;
 
-import com.example.lascarinosas.people.dto.PersonCreateDTO;
-import com.example.lascarinosas.people.dto.PersonResponseDTO;
-import com.example.lascarinosas.people.dto.PersonUpdateDTO;
+import com.example.lascarinosas.people.dtos.PersonCreateDTO;
+import com.example.lascarinosas.people.dtos.PersonResponseDTO;
+import com.example.lascarinosas.people.dtos.PersonUpdateDTO;
 import com.example.lascarinosas.people.model.Person;
-import org.springframework.stereotype.Component;
 
 public class PersonMapper {
 
@@ -13,19 +12,16 @@ public class PersonMapper {
     public static PersonResponseDTO toResponse(Person person) {
         return new PersonResponseDTO(
                 person.getId(),
-                person.getCaseId(),
+                person.getCaseEntity().getId(),
                 person.getFirstName(),
                 person.getLastName(),
                 person.getRole(),
-                person.getNotes(),
-                person.getCreatedAt(),
-                person.getVersion()
+                person.getNotes()
         );
     }
 
     public static Person toEntity(PersonCreateDTO dto) {
         Person person = new Person();
-        person.setCaseId(dto.caseId());
         person.setFirstName(dto.firstName());
         person.setLastName(dto.lastName());
         person.setRole(dto.role());

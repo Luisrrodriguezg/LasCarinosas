@@ -1,9 +1,8 @@
 package com.example.lascarinosas.people.controller;
 
-import com.example.lascarinosas.people.dto.PersonCreateDTO;
-import com.example.lascarinosas.people.dto.PersonResponseDTO;
-import com.example.lascarinosas.people.dto.PersonUpdateDTO;
-import com.example.lascarinosas.people.services.PersonServices;
+import com.example.lascarinosas.people.dtos.PersonCreateDTO;
+import com.example.lascarinosas.people.dtos.PersonResponseDTO;
+import com.example.lascarinosas.people.dtos.PersonUpdateDTO;
 import com.example.lascarinosas.people.services.PersonServicesImpl;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;

@@ -1,8 +1,8 @@
 package com.example.lascarinosas.people.services;
 
-import com.example.lascarinosas.people.dto.PersonCreateDTO;
-import com.example.lascarinosas.people.dto.PersonResponseDTO;
-import com.example.lascarinosas.people.dto.PersonUpdateDTO;
+import com.example.lascarinosas.people.dtos.PersonCreateDTO;
+import com.example.lascarinosas.people.dtos.PersonResponseDTO;
+import com.example.lascarinosas.people.dtos.PersonUpdateDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

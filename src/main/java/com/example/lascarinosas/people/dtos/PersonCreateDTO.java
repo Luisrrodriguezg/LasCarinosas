@@ -1,4 +1,4 @@
-package com.example.lascarinosas.people.dto;
+package com.example.lascarinosas.people.dtos;
 
 import com.example.lascarinosas.people.model.PersonRole;
 import jakarta.validation.constraints.NotBlank;
@@ -13,17 +13,16 @@ public record PersonCreateDTO(
         UUID caseId,
 
         @NotBlank(message = "firstName is required")
-        @Size(min = 2, max = 120, message = "firstName must be between 2 and 120 characters")
+        @Size(min = 2, max = 120)
         String firstName,
 
         @NotBlank(message = "lastName is required")
-        @Size(min = 2, max = 120, message = "lastName must be between 2 and 120 characters")
+        @Size(min = 2, max = 120)
         String lastName,
 
         @NotNull(message = "role is required")
         PersonRole role,
 
-        @Size(max = 2000, message = "notes must be at most 2000 characters")
+        @Size(max = 2000)
         String notes
 ) {}
-

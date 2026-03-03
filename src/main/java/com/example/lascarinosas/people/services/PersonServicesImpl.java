@@ -1,12 +1,14 @@
 package com.example.lascarinosas.people.services;
 
+import com.example.lascarinosas.caseentity.model.CaseEntity;
+import com.example.lascarinosas.caseentity.repository.CaseRepository;
+import com.example.lascarinosas.common.exception.NotFound;
 import com.example.lascarinosas.people.model.Person;
-import com.example.lascarinosas.people.dto.PersonCreateDTO;
-import com.example.lascarinosas.people.dto.PersonResponseDTO;
-import com.example.lascarinosas.people.dto.PersonUpdateDTO;
+import com.example.lascarinosas.people.dtos.PersonCreateDTO;
+import com.example.lascarinosas.people.dtos.PersonResponseDTO;
+import com.example.lascarinosas.people.dtos.PersonUpdateDTO;
 import com.example.lascarinosas.people.mapper.PersonMapper;
 import com.example.lascarinosas.people.repository.PersonRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -18,29 +20,44 @@ import java.util.UUID;
 public class PersonServicesImpl implements PersonServices {
 
     private final PersonRepository repository;
+    private final CaseRepository caseRepository;
 
-    public PersonServicesImpl(PersonRepository repository) {
+    public PersonServicesImpl(PersonRepository repository,
+                              CaseRepository caseRepository) {
         this.repository = repository;
+        this.caseRepository = caseRepository;
     }
 
     @Override
     public PersonResponseDTO create(PersonCreateDTO dto) {
+
+        CaseEntity caseEntity = caseRepository.findById(dto.caseId())
+                .orElseThrow(() ->
+                        new NotFound("Case not found with id: " + dto.caseId()));
+
         Person person = PersonMapper.toEntity(dto);
+        person.setCaseEntity(caseEntity);
+
         Person saved = repository.save(person);
+
         return PersonMapper.toResponse(saved);
     }
 
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
     public PersonResponseDTO getById(UUID id) {
+
         Person person = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Person not found"));
+                .orElseThrow(() ->
+                        new NotFound("Person not found with id: " + id));
+
         return PersonMapper.toResponse(person);
     }
 
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
     public List<PersonResponseDTO> getAll() {
+
         return repository.findAll()
                 .stream()
                 .map(PersonMapper::toResponse)
@@ -50,7 +67,12 @@ public class PersonServicesImpl implements PersonServices {
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
     public List<PersonResponseDTO> getByCaseId(UUID caseId) {
-        return repository.findByCaseId(caseId)
+
+        if (!caseRepository.existsById(caseId)) {
+            throw new NotFound("Case not found with id: " + caseId);
+        }
+
+        return repository.findByCaseEntityId(caseId)
                 .stream()
                 .map(PersonMapper::toResponse)
                 .toList();
@@ -58,8 +80,10 @@ public class PersonServicesImpl implements PersonServices {
 
     @Override
     public PersonResponseDTO update(UUID id, PersonUpdateDTO dto) {
+
         Person person = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Person not found"));
+                .orElseThrow(() ->
+                        new NotFound("Person not found with id: " + id));
 
         PersonMapper.updateEntity(dto, person);
 
@@ -70,9 +94,11 @@ public class PersonServicesImpl implements PersonServices {
 
     @Override
     public void delete(UUID id) {
+
         if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Person not found");
+            throw new NotFound("Person not found with id: " + id);
         }
+
         repository.deleteById(id);
     }
 }
