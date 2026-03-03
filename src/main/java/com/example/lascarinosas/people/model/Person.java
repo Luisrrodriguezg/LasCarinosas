@@ -1,40 +1,59 @@
 package com.example.lascarinosas.people.model;
-import com.example.lascarinosas.families.model.Family;
-import com.example.lascarinosas.properties.model.Property;
-import com.example.lascarinosas.victims.model.Victims;
+
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.time.Instant;
+import java.util.UUID;
 
+@Data
 @Entity
 @Table(name = "people")
-@Data
 public class Person {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    private UUID id;
 
-    @Column(nullable = false, length = 120)
-    private String name;
+    @Column(nullable = false)
+    private UUID caseId; // referencia al Case Service
 
-    @Column(name = "date_of_birth", nullable = false)
-    private LocalDate dateOfBirth;
+    @Column(nullable = false)
+    private String firstName;
 
-    @Column(length = 120)
-    private String occupation;
+    @Column(nullable = false)
+    private String lastName;
 
-    // Many people belong to one family
-    @ManyToOne
-    @JoinColumn(name = "family_id")
-    private Family family;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PersonRole role;
 
-    // One person may own many properties
-    @OneToMany(mappedBy = "owner")
-    private List<Property> properties;
+    @Column(length = 2000)
+    private String notes;
 
-    // One-to-one victim relationship
-    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
-    private Victims victim;
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @Version
+    private Long version;
+
+    public Person() {
+        // Constructor vacío requerido por JPA
+    }
+
+    public Person(UUID caseId,
+                  String firstName,
+                  String lastName,
+                  PersonRole role,
+                  String notes) {
+        this.caseId = caseId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.role = role;
+        this.notes = notes;
+    }
+
+    // Getters (idealmente sin setters públicos para caseId)
 }
