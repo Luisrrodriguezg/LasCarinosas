@@ -1,0 +1,94 @@
+services:
+
+  # ============================================================
+  # POSTGRESQL — Your main database
+  # ============================================================
+  postgres:
+    image: postgres:16
+    container_name: postgres_db_carinosas
+    restart: unless-stopped
+    ports:
+      - "5432:5432"           # Exposes DB to your host machine (for tools like DBeaver)
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lascarinosas_db  # Main app database
+    volumes:
+      - postgres_data:/var/lib/postgresql/data   # Persists data between restarts
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ============================================================
+  # KEYCLOAK — Identity and Access Management
+  # Handles login, JWT tokens, roles, and permissions
+  # Admin UI will be at: http://localhost:8081
+  # ============================================================
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.3
+    container_name: keycloak_carinosas
+    restart: unless-stopped
+    # "start-dev" enables an easy dev mode (no HTTPS required, logs are verbose)
+    command: start-dev
+    ports:
+      - "8081:8080"           # Access Keycloak at http://localhost:8081
+    environment:
+      KEYCLOAK_ADMIN: admin           # Admin username for Keycloak console
+      KEYCLOAK_ADMIN_PASSWORD: admin  # Admin password (change in production!)
+      # Tell Keycloak to use PostgreSQL as its own database
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/lascarinosas_db
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+      KC_HEALTH_ENABLED: "true"       # Enables /health endpoint on Keycloak
+    depends_on:
+      postgres:
+        condition: service_healthy    # Wait until Postgres is truly ready
+    networks:
+      - backend
+
+  # ============================================================
+  # SPRING BOOT APP — Your backend
+  # Built from your local Dockerfile
+  # ============================================================
+  springboot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lascarinosas_app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+      # Database connection (uses container name "postgres_db" as hostname inside Docker network)
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lascarinosas_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      # Keycloak connection (your app validates tokens against this)
+      # "keycloak" is the container name — Docker resolves it as a hostname inside the network
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/lascarinosas-realm
+
+      JAVA_OPTS: -Xmx512m -Xms256m   # Limit memory usage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_started    # Keycloak doesn't have a built-in health condition here
+    networks:
+      - backend
+
+volumes:
+  postgres_data:    # Named volume so Postgres data survives "docker compose down"
+
+networks:
+  backend:
+    driver: bridge  # All containers share this internal network and can talk to each other by container name
